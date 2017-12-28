@@ -1,24 +1,11 @@
-from flask import Flask, render_template, request, redirect
-from bokeh.plotting import figure, show, output_file
-from bokeh.resources import CDN
-from bokeh.embed import file_html
 
+#%%
 import requests
 import simplejson as json
 import datetime
 import numpy as np
 import pandas as pd
 
-
-app = Flask(__name__)
-
-@app.route('/', methods=['GET', 'POST'])
-def index():
-  return render_template('index.html')
-
-
-
-####################
 
 def load_dat(ticker):
     my_api_key = 'hkyex-7j959_k-uz_KnH'
@@ -51,12 +38,18 @@ def load_dat(ticker):
     df = pd.DataFrame(dat, columns=col)
     
     return df, api_url
+    
+
+#%%
+from bokeh.plotting import figure, show, output_file
+from bokeh.resources import CDN
+from bokeh.embed import file_html
 
 def create_plot(ticker):
     df, __ = load_dat(ticker)
     df['date'] = pd.to_datetime(df['date'])
     
-    # output_file("templates/line.html")
+    output_file("templates/line.html")
     
     p = figure(x_axis_type="datetime")
     p.line(df.date, df.close,
@@ -64,21 +57,16 @@ def create_plot(ticker):
     p.circle(df.date, df.close,
              fill_color="white", size=8)
     
-    p.title.text = "Closing price of %s over the past month (31 days)" %ticker
+    p.title.text = "Closing price of %s for the past month" %ticker
     p.xaxis.axis_label = 'Date'
     p.yaxis.axis_label = 'Closing price'
     
-    return file_html(p, CDN, "%s: closing data"%ticker)
+    # return file_html(p, CDN, "my plot")
+    show(p)
+    
+def test():
+    ticker = 'GOOG'
+    html = create_plot(ticker)
+    return html
 
-
-####################
-
-@app.route('/results', methods=['GET', 'POST'])
-def ticker_result():
-    ticker = request.form['ticker']
-    return create_plot(ticker)
-
-
-
-if __name__ == '__main__':
-  app.run(port=33507)
+#%%
