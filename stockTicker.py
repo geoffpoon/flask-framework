@@ -44,6 +44,8 @@ def load_dat(ticker):
 from bokeh.plotting import figure, show, output_file
 from bokeh.resources import CDN
 from bokeh.embed import file_html
+from bokeh.models import (HoverTool, FactorRange, Plot, LinearAxis, Grid,
+                          Range1d)
 
 def create_plot(ticker):
     df, __ = load_dat(ticker)
